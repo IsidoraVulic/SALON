@@ -43,18 +43,18 @@ class Appointment{
         }
     }
 
-    /*public static function getById(mysqli $conn){
+    public static function getById(mysqli $conn){
             $query = "SELECT FROM appointment where id=$appointment->id";
              return $conn->query($query);
-    }*/
+    }
 
     //dodaj termin
 
-   /* public static function add(Appointment $appointment, mysqli $conn){
+   public static function add(Appointment $appointment, mysqli $conn){
 
         $query = "INSERT INTO appointment (user, service, date) VALUES ('$appointment->user->id', '$appointment->service_id', '$prijava->date')";
         return $conn->query($query);
-    }*/
+    }
 
     //izbrisi termin
 
