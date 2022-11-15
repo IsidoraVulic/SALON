@@ -2,12 +2,14 @@
 
 require "dbBroker.php";
 require "model/service.php";
+require "model/appointment.php";
 
 session_start();
-/*if(!isset($_SESSION['user_id'])){
+
+if(!isset($_SESSION['id'])){
     header('Location: index.php');
     exit();
-}*/
+}
 
 $rezultat = Service::getAll($conn);
 
@@ -127,7 +129,7 @@ if($rezultat->num_rows==0){
   <div class="container my-5 py-5">
     <div class="row">
       <div class="col-12 text-center">
-        <h4 class="small font-weight-bolder dd mb-5 pb-4 text-white pt-5">Our services</h4>
+        <h4 class="small font-weight-bolder dd mb-5 pb-4 text-white pt-5">My Appointments</h4>
       </div>
     </div>
     <div class="row mb-4">
@@ -137,22 +139,50 @@ if($rezultat->num_rows==0){
                 <thead>
 
                 <tr>  
-                    <th scope="col">Termin</th>
+                    <th scope="col">Redni broj</th>
                     <th scope="col">Usluga</th>
+                    <th scope="col">Cena</th>
+                    <th scope="col">Datum</th>
                     
                 </tr>
     
                 </thead>
 
-                <tbody>
-                
-
+                <tbody id="my-appointments-table">
+                <?php
+                $appointments = Appointment::getAll($conn);
+                if ($appointments != null) {
+                    foreach ($appointments as $appointment) :
+                        ?>
+               
                 <tr>
-                   <td></td>
-                    <td></td>
-                </tr>
+                    <td><?php echo $appointment->id ?></td>
+                    <td><?php echo $appointment->service->type?></td>
+                    <td><?php echo $appointment->service->price?></td>
+                    <td><?php echo $appointment->date?></td>
+                    <td>
+                      <button id="editAppointment"
+                              class="edit-appointment"
+                              data-toggle="modal" data-target="#editModal"
+                              title="Edit appointment"
+                              value="<?php echo $appointment->id ?>">
+                      </button>
+                    </td>
 
-                
+                    <td>
+                      <button id="deleteAppointment"
+                              class="delete-appointment"
+                              name="deleteAppointment"
+                              title="Delete appointment"
+                              value="<?php echo $appointment->id ?>">
+                      </button>
+                    </td>
+                </tr>
+                <?php
+                  endforeach;
+                }
+                ?>
+           
                 </tbody>
             </table>
         </div>
@@ -202,7 +232,7 @@ if($rezultat->num_rows==0){
 
                     <?php
                     endwhile;
-                    }
+                  }
                     ?>
                     </tbody>
                   </table>

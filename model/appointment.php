@@ -18,17 +18,43 @@ class Appointment{
 
     //prikazi sve termine od jednog klijenta
 
-    public static function getAll(mysqli $conn){
-        $query = "select * from appointment";
-        return $conn->query($query);
+    public static function getAll(mysqli $conn): ?array{
+        $query = "SELECT * FROM appointment a JOIN user u ON a.user = u.id 
+        JOIN service s ON s.id = a.service;
+
+        $result = $conn->query($query);
+        if (!$result) {
+            echo 'Error while retrieving data';
+            return null;
+        }
+        if ($result->num_rows == 0) {
+            echo 'No appointments currently';
+            return null;
+        } else {
+            $appointments = array();
+            while ($row = $result->fetch_array()) {
+                $user = new User($row->user, $row->username, $row->password, $row->contact);
+                $service = new Service($row->service, $row->type, $row->price);
+                $date = $row->date;
+                $appointment = new Appointment($row->id, $user, $service, $date);
+                array_push($appointments, $appointment);
+            }
+            return $appointments;
+        }
     }
+
+    /*public static function getById(mysqli $conn){
+            $query = "SELECT FROM appointment where id=$appointment->id";
+             return $conn->query($query);
+    }*/
 
     //dodaj termin
 
-    public static function add(Appointment $a, Service $s, User $u, date $d, mysqli $conn){
-        $query = "INSERT INTO appointment(id, user, service, date) VALUES(null, '$u', '$s', '$d')";
+   /* public static function add(Appointment $appointment, mysqli $conn){
+
+        $query = "INSERT INTO appointment (user, service, date) VALUES ('$appointment->user->id', '$appointment->service_id', '$prijava->date')";
         return $conn->query($query);
-    }
+    }*/
 
     //izbrisi termin
 
@@ -39,8 +65,13 @@ class Appointment{
 
     //azuriraj termin
 
-    public static function update(Appointment $a, User $u, Service $s, date $d, mysqli $conn){
-        $query = "UPDATE appointment SET service=$this->service, user=$this->user";
+    public static function update(Appointment $appointment, mysqli $conn){
+        $user_id = $appointment->user->id;
+        $service_id = $appointment->service->id;
+        $date = $appointment->date->format("Y-m-d H:i:s");
+
+        $query = "UPDATE appointment SET date = ' $date', user = $user_id, service = $service_id WHERE id=$appointment->id";
+
         return $conn->query($query);
     }
 }

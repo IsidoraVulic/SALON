@@ -5,24 +5,22 @@ require "model/user.php";
 
 session_start();
 
-if(isset($_POST['username']) && isset($_POST['password'])){
-	$username = $_POST['username'];
-	$password = $_POST['password'];
+$loginError = false;
 
-	$user = new User($id, $username, $password);
+if (isset($_POST['username']) && isset($_POST['password'])) {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
 
-	$response = User::loginUser($user, $conn);
+    $user = User::loginUser($username, $password, $conn);
 
-	if($response->num_rows==1){
-		echo "Uspesno ste se prijavili!";
-		$_SESSION['id']= $user->id;
-		header('Location: home.php');
-		exit();
-	}else{
-		echo "Prijava nije uspela";
-	}
+    if ($user != null) {
+        $_SESSION['id'] = $user->id;
+        header('Location: home.php');
+        exit();
+    } else {
+        $loginError = true;
+    }
 }
-
 
 ?>
 
