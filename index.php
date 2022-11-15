@@ -14,7 +14,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
     $user = User::loginUser($username, $password, $conn);
 
     if ($user != null) {
-        $_SESSION['id'] = $user->id;
+        $_SESSION['user_id'] = $user->id;
         header('Location: home.php');
         exit();
     } else {
@@ -38,7 +38,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 	<link rel="stylesheet" href="css/style.css">
 	
 	</head>
-	<body style="background-image: url(images/salon.jpg);">
+	<body style="background-image: url(images/salon.png);">
 	<section class="ftco-section">
 		<div class="container">
 			<div class="row justify-content-center">

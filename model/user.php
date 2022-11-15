@@ -22,6 +22,18 @@ class User{
         }
         return null;
     }
+
+    public static function getById($id, mysqli $conn): ?User
+    {
+        $query = "SELECT * FROM user WHERE id=$id";
+        $result = $conn->query($query);
+        if ($result) {
+            $row = $result->fetch_array(1);
+            return new User($row["id"], $row["username"], $row["password"], $row["contact"]);
+        } else {
+            return null;
+        }
+    }
 }
 
 ?>

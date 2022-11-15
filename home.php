@@ -3,10 +3,11 @@
 require "dbBroker.php";
 require "model/service.php";
 require "model/appointment.php";
+require "model/user.php";
 
 session_start();
 
-if(!isset($_SESSION['id'])){
+if(!isset($_SESSION['user_id'])){
     header('Location: index.php');
     exit();
 }
@@ -121,7 +122,15 @@ if($rezultat->num_rows==0){
     </div>
   </div>
   <div class="row mt-5">
-    <div class="col-12 text-center"> <a href="#" class="btn btn-dark mr-2"> BOOK APPOINTMENT </a> <a href="#" class="btn btn-outline-dark ml-2"> VIEW TESTIMONIALS </a> </div>
+    <div class="col-12 text-center"> 
+      <button
+        id="bookApp" 
+        type="button" 
+        class= "btn btn-sm btn-dark ml-3"
+        data-toggle="modal"
+        data-target="#addModal">BOOK APPOINTMENT
+        </button>
+    </div>
   </div>
 </div>
 <!---------------About video section ends here --------------------->
@@ -132,10 +141,9 @@ if($rezultat->num_rows==0){
         <h4 class="small font-weight-bolder dd mb-5 pb-4 text-white pt-5">My Appointments</h4>
       </div>
     </div>
-    <div class="row mb-4">
-      <div class="col-12">
+    
         <div class="row justify-content-center">
-            <table width= "500" border="10" style="background-color: white; border-color: rgba(0, 0, 0, 0.1);">
+            <table class="table table-striped" style="background-color: white; border-color: rgba(0, 0, 0, 0.1);">
                 <thead>
 
                 <tr>  
@@ -143,6 +151,8 @@ if($rezultat->num_rows==0){
                     <th scope="col">Usluga</th>
                     <th scope="col">Cena</th>
                     <th scope="col">Datum</th>
+                    <th scope="col">Izmeni</th>
+                    <th scope="col">Obriši</th>
                     
                 </tr>
     
@@ -159,23 +169,21 @@ if($rezultat->num_rows==0){
                     <td><?php echo $appointment->id ?></td>
                     <td><?php echo $appointment->service->type?></td>
                     <td><?php echo $appointment->service->price?></td>
-                    <td><?php echo $appointment->date?></td>
+                    <td><?php echo $appointment->date->format("Y M j , h:m a")?></td>
                     <td>
-                      <button id="editAppointment"
-                              class="edit-appointment"
+                      <button id="editAppointment" 
+                              class="btn btn-outline-dark ml-2"
                               data-toggle="modal" data-target="#editModal"
-                              title="Edit appointment"
-                              value="<?php echo $appointment->id ?>">
-                      </button>
+                             
+                              value="<?php echo $appointment->id ?>">Edit appointment</button>
                     </td>
 
                     <td>
-                      <button id="deleteAppointment"
-                              class="delete-appointment"
+                      <button id="deleteAppointment" 
+                              class="btn btn-outline-dark ml-2"
                               name="deleteAppointment"
-                              title="Delete appointment"
-                              value="<?php echo $appointment->id ?>">
-                      </button>
+                              
+                              value="<?php echo $appointment->id ?>">Delete appointment</button>
                     </td>
                 </tr>
                 <?php
@@ -186,8 +194,7 @@ if($rezultat->num_rows==0){
                 </tbody>
             </table>
         </div>
-      </div>
-    </div>
+      
   </div>
 </div>
 <!---------------Team section ends here --------------------->
@@ -200,21 +207,13 @@ if($rezultat->num_rows==0){
             <h4 class="small font-weight-bolder dd mb-5 pb-4 pt-5">Services</h4>
           </div>
           <div class="col-12">
-            <ul id="tabs" class="nav nav-tabs d-flex justify-content-center" role="tablist">
-              <li class="nav-item"> <a id="tab-A" href="#pane-A" class="nav-link active" data-toggle="tab" role="tab">STYLING</a> </li>
-              <li class="nav-item"> <a id="tab-B" href="#pane-B" class="nav-link" data-toggle="tab" role="tab">COLOR</a> </li>
-              <li class="nav-item"> <a id="tab-C" href="#pane-C" class="nav-link" data-toggle="tab" role="tab">TREATMENTS</a> </li>
-              <li class="nav-item"> <a id="tab-d" href="#pane-d" class="nav-link" data-toggle="tab" role="tab">EXTENSIONS</a> </li>
-            </ul>
-            <div id="content" class="tab-content" role="tablist">
-              <div id="pane-A" class="tab-pane fade show active" role="tabpanel">
-                <div id="collapse-A" class="collapse show" role="tabpanel">
+            
                   <table class="table table-striped">
                   <thead>
 
                     <tr>  
-                        <th scope="col">Termin</th>
                         <th scope="col">Usluga</th>
+                        <th scope="col">Cena</th>
                         
                     </tr>
 
@@ -465,9 +464,110 @@ if($rezultat->num_rows==0){
 </div>
 
 <!---------------Copyright section ends here ---------------------> 
+
+
+<!--------------- MODAL ADD --------------------->
+<div class="modal fade" id="addModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Zakažite termin</h3>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="container add-form">
+                    <form action="#" method="post" id="addForm">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="">Usluga:</label>
+                                    <select name="service" id="service" class="form-control">
+                                        <option value="" selected disabled>--- Izaberite uslugu ---</option>
+                                        <?php
+                                        $services = Service::getAllAsArray($conn);
+                                        if ($services != null) {
+                                            foreach ($services as $service) {
+                                              echo "<option value=\"" . $service->id . "\">" . $service->type . ", " . $service->price . "</option>";
+                                            }
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="">Datum i vreme:</label>
+                                    <input type="datetime-local" id="date" name="date"
+                                           class="form-control"/>
+                                </div>
+                                <div class="form-group">
+                                    <button id="btnAdd" type="submit" class="btn btn-outline-dark ml-2">Sačuvaj</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--------------- MODAL EDIT --------------------->
+<div class="modal fade" id="editModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Appointment</h3>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="container edit-form">
+                    <form action="#" method="post" id="editForm">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="">ID</label>
+                                    <input id="idEdit" type="text" name="idEdit" class="form-control" readonly/>
+                                </div>
+                                <div class="form-group">
+                                <label for="">Usluga:</label>
+                                    <select name="service" id="service" class="form-control">
+                                        <option value="" selected disabled>--- Izaberite uslugu ---</option>
+                                        <?php
+                                        $services = Service::getAllAsArray($conn);
+                                        if ($services != null) {
+                                            foreach ($services as $service) {
+                                              echo "<option value=\"" . $service->id . "\">" . $service->type . ", " . $service->price . "</option>";
+                                            }
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="">Datum i vreme:</label>
+                                    <input type="datetime-local" id="date" name="date"
+                                           class="form-control"/>
+                                </div>
+                                <div class="form-group">
+                                    <button id="btnEdit" type="submit" class="btn btn-primary">Edit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script> 
 <script src="js/bootstrap.js"></script> 
 <script src="js/jquery.bxslider.min1.js"></script> 
+
+
+
+
 <script>
   $(document).ready(function(){
     $('.slider').bxSlider({	
@@ -477,6 +577,44 @@ if($rezultat->num_rows==0){
 	slideWidth:400
 	});
   });
+
+  $('#addForm').submit(function () {
+        event.preventDefault();
+        console.log("Adding");
+        const $form = $(this);
+        const $input = $form.find('select');
+
+        const serializedData = $form.serialize();
+        console.log(serializedData);
+
+        $input.prop('disabled', true);
+
+        request = $.ajax({
+            url: 'handler/add.php',
+            type: 'post',
+            data: serializedData
+        });
+
+        request.done(function (response) {
+            console.log(response);
+            if (response == "Success") {
+              alert("Termin zakazan!");
+                console.log("Added appointment");
+                location.reload(true);
+            } else {
+              alert("Termin nije zakazan!");
+                console.log("Appointment not added " + response);
+            }
+            console.log(response);
+        });
+
+        request.fail(function (jqXHR, textStatus, errorThrown) {
+            console.error("Error occurred: " + textStatus, errorThrown);
+        });
+    })
+
+    
+
 </script>
 </body>
 </html>
