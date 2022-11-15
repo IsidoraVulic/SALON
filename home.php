@@ -4,10 +4,10 @@ require "dbBroker.php";
 require "model/service.php";
 
 session_start();
-if(!isset($_SESSION['user_id'])){
+/*if(!isset($_SESSION['user_id'])){
     header('Location: index.php');
     exit();
-}
+}*/
 
 $rezultat = Service::getAll($conn);
 
