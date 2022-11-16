@@ -91,6 +91,24 @@ class Appointment{
             return null;
         }
     }
+
+    public static function getByUserId($id, mysqli $conn): ?Appointment
+    {
+        $query = "SELECT * FROM appointment a JOIN user u ON a.user = u.id 
+        JOIN service s ON a.service=s.id WHERE u.id=$id";
+
+        $result = $conn->query($query);
+
+        if ($result) {
+            $row = $result->fetch_array(1);
+            $user = new User($row["user"], $row["username"], $row["password"], $row["contact"], $row["firstname"], $row["lastname"]);
+            $service = new Service($row["service"], $row["type"], $row["price"]);
+            $date = new DateTime($row["date"]);
+            return new Appointment($row["id"], $user, $service, $date);
+        } else {
+            return null;
+        }
+    }
    
 }
 

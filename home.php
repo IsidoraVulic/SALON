@@ -7,10 +7,11 @@ require "model/user.php";
 
 session_start();
 
-if(!isset($_SESSION['user_id'])){
+if(!isset($_SESSION['admin_id'])){
     header('Location: index.php');
     exit();
 }
+
 
 $rezultat = Service::getAll($conn);
 
@@ -47,20 +48,18 @@ if($rezultat->num_rows==0){
       <ul class="navbar-nav ml-auto">
         <li class="nav-item active"> <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a> </li>
         <li class="nav-item"> <a class="nav-link" href="#">About</a> </li>
-        <li class="nav-item dropdown"> <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Services </a> 
-          <!-- Here's the magic. Add the .animate and .slide-in classes to your .dropdown-menu and you're all set! -->
-          <div class="dropdown-menu dropdown-menu-right animate slideIn" aria-labelledby="navbarDropdown"> <a class="dropdown-item" href="#">Skin</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#">Hair</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#">MakeUp</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#">Wellness</a> </div>
+        <li class="nav-item"> <a class="nav-link" href="#services"> Services </a> 
         </li>
-        <li class="nav-item"> <a class="nav-link" href="myapp.php">My Appointments</a> </li>
+        <li class="nav-item"> <a class="nav-link" href="#appointments">Appointments</a> </li>
         <li class="nav-item"> <a class="nav-link" href="#">Contact</a> </li>
       </ul>
-      <a href="book.php" class="btn btn-sm btn-dark ml-3">Book Now</a> </div>
+      <button
+        id="bookApp" 
+        type="button" 
+        class= "btn btn-sm btn-dark ml-3"
+        data-toggle="modal"
+        data-target="#addModal">BOOK NOW
+        </button>
   </div>
 </nav>
 
@@ -138,21 +137,41 @@ if($rezultat->num_rows==0){
   <div class="container my-5 py-5">
     <div class="row">
       <div class="col-12 text-center">
+      <section id="appointments">
         <h4 class="small font-weight-bolder dd mb-5 pb-4 text-white pt-5">Appointments</h4>
       </div>
     </div>
     
         <div class="row justify-content-center">
-            <table class="table table-striped" style="background-color: white; border-color: rgba(0, 0, 0, 0.1);">
+        <div class="row mb-2">
+                            <div class="col-xs-12 col-md-5 ">
+                                <select class="custom-select" id="search-appointments-dropdown">
+                                    <option value="ID">ID termina</option>
+                                    <option value="Lastname">Prezime korisnika</option>
+                                    <option value="Firstname">Ime korsnika</option>
+                                    <option value="Service">Usluga</option>
+                                </select>
+                            </div>
+                            <div class="col-xs-12 col-md-12 ">
+                                <input type="text" id="searchAppointmentBar"
+                                       placeholder="Pretražite termine..." class="form-control search mr-2"
+                                       aria-label="Text input with dropdown button"
+                                       onkeyup="searchAppointmentByProperty()"/>
+                            </div>
+                        </div>
+            <table id="appointmentTable" class="table table-striped" style="background-color: white; border-color: rgba(0, 0, 0, 0.1);">
                 <thead>
 
                 <tr>  
-                    <th scope="col">ID korisnika</th>
-                    <th scope="col">Usluga</th>
+                    <th scope="col">ID termina</th>
+                    <th onclick="sortTable2(1)" scope="col">Ime korisnika</th>
+                    <th onclick="sortTable2(2)" scope="col">Prezime korisnika</th>
+                    <th onclick="sortTable2(3)" scope="col">Usluga</th>
                     <th scope="col">Cena</th>
                     <th scope="col">Datum</th>
                     <th scope="col">Izmeni</th>
                     <th scope="col">Obriši</th>
+                    
                     
                 </tr>
     
@@ -167,7 +186,9 @@ if($rezultat->num_rows==0){
                         ?>
                
                 <tr>
-                    <td><?php echo $appointment->user->id ?></td>
+                    <td><?php echo $appointment->id ?></td>
+                    <td><?php echo $appointment->user->firstname ?></td>
+                    <td><?php echo $appointment->user->lastname ?></td>
                     <td><?php echo $appointment->service->type?></td>
                     <td><?php echo $appointment->service->price?></td>
                     <td><?php echo $appointment->date->format("j M Y , g:i a")?></td>
@@ -195,7 +216,7 @@ if($rezultat->num_rows==0){
                 </tbody>
             </table>
         </div>
-      
+              </section>
   </div>
 </div>
 <!---------------Appointments section ends here --------------------->
@@ -205,15 +226,17 @@ if($rezultat->num_rows==0){
       <div style="border:1px solid #ebebeb; box-shadow: 0 0 10px rgba(0,0,0, .15);">
         <div class="row">
           <div class="col-12 text-center">
-            <h4 class="small font-weight-bolder dd mb-5 pb-4 pt-5">Services</h4>
+          <section id="services">
+            <h4 class="small font-weight-bolder dd mb-5 pb-4 pt-5">Usluge</h4>
           </div>
           <div class="col-12">
             
-                  <table class="table table-striped">
+                  <table id="serviceTable" class="table table-striped">
                   <thead>
+                      
 
                     <tr>  
-                        <th scope="col">Usluga</th>
+                        <th onclick="sortTable(0)" scope="col">Usluga</th>
                         <th scope="col">Cena</th>
                         
                     </tr>
@@ -236,99 +259,9 @@ if($rezultat->num_rows==0){
                     ?>
                     </tbody>
                   </table>
+                </section>
                 </div>
               </div>
-              <div id="pane-B" class="tab-pane fade" role="tabpanel">
-                <div id="collapse-B" class="collapse show" role="tabpanel">
-                  <table class="table table-striped">
-                    <thead>
-                      <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Services</th>
-                        <th scope="col">Stylists</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <th scope="row">1</th>
-                        <td>CUT & BLOW DRY</td>
-                        <td>From $205</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">2</th>
-                        <td>BARBERING</td>
-                        <td>From $145</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">3</th>
-                        <td>BLOW DRY / STYLE</td>
-                        <td>From $95</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-              <div id="pane-C" class="tab-pane fade" role="tabpanel" aria-labelledby="tab-C">
-                <div id="collapse-C" class="collapse show" role="tabpanel" aria-labelledby="heading-C">
-                  <table class="table table-striped">
-                    <thead>
-                      <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Services</th>
-                        <th scope="col">Stylists</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <th scope="row">1</th>
-                        <td>CUT & BLOW DRY</td>
-                        <td>From $205</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">2</th>
-                        <td>BARBERING</td>
-                        <td>From $145</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">3</th>
-                        <td>BLOW DRY / STYLE</td>
-                        <td>From $95</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-              <div id="pane-d" class="tab-pane fade" role="tabpanel">
-                <div id="collapse-d" class="collapse show" role="tabpanel">
-                  <table class="table table-striped">
-                    <thead>
-                      <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Services</th>
-                        <th scope="col">Stylists</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <th scope="row">1</th>
-                        <td>CUT & BLOW DRY</td>
-                        <td>From $205</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">2</th>
-                        <td>BARBERING</td>
-                        <td>From $145</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">3</th>
-                        <td>BLOW DRY / STYLE</td>
-                        <td>From $95</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -589,6 +522,7 @@ if($rezultat->num_rows==0){
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script> 
 <script src="js/bootstrap.js"></script> 
 <script src="js/jquery.bxslider.min1.js"></script> 
+<script src="https://www.kryogenix.org/code/browser/sorttable/sorttable.js"></script>
 <script
   src="https://code.jquery.com/jquery-3.3.1.min.js"
   integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
@@ -615,13 +549,13 @@ if($rezultat->num_rows==0){
         max.setMilliseconds(null);
         max.setSeconds(null);
 
-        document.getElementById('appointmentTime').value = now.toISOString().slice(0, -1);
+        document.getElementById('date').value = now.toISOString().slice(0, -1);
 
-        document.getElementById('appointmentTime').min = now.toISOString().slice(0, -1);
-        document.getElementById('appointmentTime').max = max.toISOString().slice(0, -1);
+        document.getElementById('date').min = now.toISOString().slice(0, -1);
+        document.getElementById('date').max = max.toISOString().slice(0, -1);
 
-        document.getElementById('appointmentTimeEdit').min = now.toISOString().slice(0, -1);
-        document.getElementById('appointmentTimeEdit').max = max.toISOString().slice(0, -1);
+        document.getElementById('dateEdit').min = now.toISOString().slice(0, -1);
+        document.getElementById('dateEdit').max = max.toISOString().slice(0, -1);
 
 
   });
@@ -630,7 +564,7 @@ if($rezultat->num_rows==0){
     event.preventDefault();
     console.log("Adding");
     const $form = $(this);
-    const $input = $form.find('select, input');
+    const $input = $form.find('select');
 
     const serializedData = $form.serialize();
     console.log(serializedData);
@@ -752,6 +686,107 @@ $('#editForm').submit(function () {
         });
     });
 
+    function searchAppointmentByProperty() {
+        let selectedProperty = $("#search-appointments-dropdown option:selected").text();
+        input = document.getElementById("searchAppointmentBar");
+        filter = input.value.toUpperCase();
+
+        let table = document.getElementById("appointmentTable");
+        let tr = table.getElementsByTagName("tr");
+
+        for (i = 0; i < tr.length; i++) {
+            switch (selectedProperty) {
+               
+                
+                case "ID termina":
+                    td = tr[i].getElementsByTagName("td")[0];
+
+                    break;
+                case "Ime korisnika":
+                    td = tr[i].getElementsByTagName("td")[1];
+                    break;
+
+                case "Prezime korisnika":
+                    td = tr[i].getElementsByTagName("td")[2];
+                    break;
+
+                case "Usluga":
+                    td = tr[i].getElementsByTagName("td")[3];
+                    break;
+                default:
+            }
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+
+    function sortTable(n) {
+      var table, rows, switching, i, x, y, shouldSwitch;
+      table = document.getElementById("serviceTable");
+      switching = true;
+      
+      while (switching) {
+        
+        switching = false;
+        rows = table.rows;
+        
+        for (i = 1; i < (rows.length - 1); i++) {
+          
+          shouldSwitch = false;
+         
+          x = rows[i].getElementsByTagName("TD")[n];
+          y = rows[i + 1].getElementsByTagName("TD")[n];
+         
+          if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+            
+            shouldSwitch = true;
+            break;
+          }
+        }
+        if (shouldSwitch) {
+         
+          rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+          switching = true;
+        }
+      }
+    }
+
+    function sortTable2(n) {
+      var table, rows, switching, i, x, y, shouldSwitch;
+      table = document.getElementById("appointmentTable");
+      switching = true;
+      
+      while (switching) {
+        
+        switching = false;
+        rows = table.rows;
+        
+        for (i = 1; i < (rows.length - 1); i++) {
+          
+          shouldSwitch = false;
+         
+          x = rows[i].getElementsByTagName("TD")[n];
+          y = rows[i + 1].getElementsByTagName("TD")[n];
+         
+          if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+            
+            shouldSwitch = true;
+            break;
+          }
+        }
+        if (shouldSwitch) {
+         
+          rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+          switching = true;
+        }
+      }
+    }
 
 
 </script>

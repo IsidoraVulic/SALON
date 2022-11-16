@@ -1,7 +1,7 @@
 <?php
 
 require "dbBroker.php";
-require "model/user.php";
+require "model/admin.php";
 
 session_start();
 
@@ -11,10 +11,12 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    $user = User::loginUser($username, $password, $conn);
+    $admin = Admin::loginAdmin($username, $password, $conn);
 
-    if ($user != null) {
-        $_SESSION['user_id'] = $user->id;
+    if ($admin != null) {
+		ini_set('session.gc_maxlifetime', 60*60*24);
+        $_SESSION['admin_id'] = $admin->id;
+
         header('Location: home.php');
         exit();
     } else {
