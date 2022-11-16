@@ -31,7 +31,7 @@ class Appointment{
         } else {
             $appointments = array();
             while ($row = mysqli_fetch_array($result)) {
-                $user = new User($row['user'], $row['username'], $row['password'], $row['contact']);
+                $user = new User($row['user'], $row['username'], $row['password'],$row['contact'], $row['firstname'], $row['lastname']);
                 $service = new Service($row['service'], $row['type'], $row['price']);
                 $date = new DateTime($row['date']);
                 $appointment = new Appointment($row['id'], $user, $service, $date);
@@ -48,15 +48,15 @@ class Appointment{
         $service_id = $appointment->service->id;
         $date = $appointment->date->format("Y-m-d H:i:s");
 
-        $query = "UPDATE appointment SET date = ' $date', user = $user_id, service = $service_id WHERE id=$appointment->id";
+        $query = "UPDATE appointment SET date = '$date', user = $user_id, service = $service_id WHERE id=$appointment->id";
 
         return $conn->query($query);
     }
 
     //izbrisi termin
 
-    public static function deleteById(mysqli $conn){
-        $query = "DELETE FROM appointment WHERE id='$this->id'";
+    public static function deleteById($id, mysqli $conn){
+        $query = "DELETE FROM appointment WHERE id=$id";
         return $conn->query($query);
     }
 
@@ -83,10 +83,10 @@ class Appointment{
 
         if ($result) {
             $row = $result->fetch_array(1);
-            $user = new User($row["user"], $row["username"], $row["password"], $row["contact"]);
+            $user = new User($row["user"], $row["username"], $row["password"], $row["contact"], $row["firstname"], $row["lastname"]);
             $service = new Service($row["service"], $row["type"], $row["price"]);
             $date = new DateTime($row["date"]);
-            return new Appointment($row["a.id"], $user, $service, $date);
+            return new Appointment($row["id"], $user, $service, $date);
         } else {
             return null;
         }

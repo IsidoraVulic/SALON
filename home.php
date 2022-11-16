@@ -138,7 +138,7 @@ if($rezultat->num_rows==0){
   <div class="container my-5 py-5">
     <div class="row">
       <div class="col-12 text-center">
-        <h4 class="small font-weight-bolder dd mb-5 pb-4 text-white pt-5">My Appointments</h4>
+        <h4 class="small font-weight-bolder dd mb-5 pb-4 text-white pt-5">Appointments</h4>
       </div>
     </div>
     
@@ -147,7 +147,7 @@ if($rezultat->num_rows==0){
                 <thead>
 
                 <tr>  
-                    <th scope="col">Redni broj</th>
+                    <th scope="col">ID korisnika</th>
                     <th scope="col">Usluga</th>
                     <th scope="col">Cena</th>
                     <th scope="col">Datum</th>
@@ -159,6 +159,7 @@ if($rezultat->num_rows==0){
                 </thead>
 
                 <tbody id="my-appointments-table">
+                  
                 <?php
                 $appointments = Appointment::getAll($conn);
                 if ($appointments != null) {
@@ -166,13 +167,13 @@ if($rezultat->num_rows==0){
                         ?>
                
                 <tr>
-                    <td><?php echo $appointment->id ?></td>
+                    <td><?php echo $appointment->user->id ?></td>
                     <td><?php echo $appointment->service->type?></td>
                     <td><?php echo $appointment->service->price?></td>
-                    <td><?php echo $appointment->date->format("Y M j , h:m a")?></td>
+                    <td><?php echo $appointment->date->format("j M Y , g:i a")?></td>
                     <td>
                       <button id="editAppointment" 
-                              class="btn btn-outline-dark ml-2"
+                              class="btn btn-outline-dark ml-2 edit-appointment"
                               data-toggle="modal" data-target="#editModal"
                              
                               value="<?php echo $appointment->id ?>">Edit appointment</button>
@@ -180,7 +181,7 @@ if($rezultat->num_rows==0){
 
                     <td>
                       <button id="deleteAppointment" 
-                              class="btn btn-outline-dark ml-2"
+                              class="btn btn-outline-dark ml-2 delete-appointment"
                               name="deleteAppointment"
                               
                               value="<?php echo $appointment->id ?>">Delete appointment</button>
@@ -197,7 +198,7 @@ if($rezultat->num_rows==0){
       
   </div>
 </div>
-<!---------------Team section ends here --------------------->
+<!---------------Appointments section ends here --------------------->
 <div class="container mb-5">
   <div class="row">
     <div class="col-12">
@@ -480,6 +481,18 @@ if($rezultat->num_rows==0){
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
+                                    <label for="">Korisnik:</label>
+                                        <select name="user" id="user" class="form-control">
+                                            <option value="" selected disabled>--- Izaberite korisnika ---</option>
+                                            <?php
+                                            $users = User::getAllAsArray($conn);
+                                            if ($users != null) {
+                                                foreach ($users as $user) {
+                                                    echo "<option value=\"" . $user->id . "\">" . $user->firstname . ", " . $user->lastname . "</option>";
+                                                }
+                                            }
+                                            ?>
+                                        </select>
                                     <label for="">Usluga:</label>
                                     <select name="service" id="service" class="form-control">
                                         <option value="" selected disabled>--- Izaberite uslugu ---</option>
@@ -515,7 +528,7 @@ if($rezultat->num_rows==0){
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Edit Appointment</h3>
+                <h3>Izmeni termin</h3>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             <div class="modal-body">
@@ -528,8 +541,20 @@ if($rezultat->num_rows==0){
                                     <input id="idEdit" type="text" name="idEdit" class="form-control" readonly/>
                                 </div>
                                 <div class="form-group">
+                                <label for="">Korisnik:</label>
+                                        <select name="userEdit" id="userEdit" class="form-control">
+                                            <option value="" selected disabled>--- Izaberite korisnika ---</option>
+                                            <?php
+                                            $users = User::getAllAsArray($conn);
+                                            if ($users != null) {
+                                                foreach ($users as $user) {
+                                                    echo "<option value=\"" . $user->id . "\">" . $user->firstname . ", " . $user->lastname . "</option>";
+                                                }
+                                            }
+                                            ?>
+                                        </select>
                                 <label for="">Usluga:</label>
-                                    <select name="service" id="service" class="form-control">
+                                    <select name="serviceEdit" id="serviceEdit" class="form-control">
                                         <option value="" selected disabled>--- Izaberite uslugu ---</option>
                                         <?php
                                         $services = Service::getAllAsArray($conn);
@@ -543,11 +568,11 @@ if($rezultat->num_rows==0){
                                 </div>
                                 <div class="form-group">
                                     <label for="">Datum i vreme:</label>
-                                    <input type="datetime-local" id="date" name="date"
+                                    <input type="datetime-local" id="dateEdit" name="dateEdit"
                                            class="form-control"/>
                                 </div>
                                 <div class="form-group">
-                                    <button id="btnEdit" type="submit" class="btn btn-primary">Edit</button>
+                                    <button id="btnEdit" type="submit" class="btn btn-outline-dark ml-2">Izmeni</button>
                                 </div>
                             </div>
                         </div>
@@ -560,60 +585,174 @@ if($rezultat->num_rows==0){
 
 
 
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script> 
 <script src="js/bootstrap.js"></script> 
 <script src="js/jquery.bxslider.min1.js"></script> 
-
+<script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
 
 
 
 <script>
   $(document).ready(function(){
     $('.slider').bxSlider({	
-	minSlides:1,
-	maxSlides:3,
-    captions: true,
-	slideWidth:400
-	});
+	      minSlides:1,
+	      maxSlides:3,
+        captions: true,
+	      slideWidth:400
+	  });
+
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        now.setSeconds(null);
+        now.setMilliseconds(null);
+
+        const max = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+        max.setMinutes(max.getMinutes() - max.getTimezoneOffset());
+        max.setMilliseconds(null);
+        max.setSeconds(null);
+
+        document.getElementById('appointmentTime').value = now.toISOString().slice(0, -1);
+
+        document.getElementById('appointmentTime').min = now.toISOString().slice(0, -1);
+        document.getElementById('appointmentTime').max = max.toISOString().slice(0, -1);
+
+        document.getElementById('appointmentTimeEdit').min = now.toISOString().slice(0, -1);
+        document.getElementById('appointmentTimeEdit').max = max.toISOString().slice(0, -1);
+
+
   });
 
   $('#addForm').submit(function () {
-        event.preventDefault();
-        console.log("Adding");
-        const $form = $(this);
-        const $input = $form.find('select');
+    event.preventDefault();
+    console.log("Adding");
+    const $form = $(this);
+    const $input = $form.find('select, input');
 
-        const serializedData = $form.serialize();
-        console.log(serializedData);
+    const serializedData = $form.serialize();
+    console.log(serializedData);
 
-        $input.prop('disabled', true);
+    $input.prop('disabled', true);
+
+    request = $.ajax({
+        url: 'handler/add.php',
+        type: 'post',
+        data: serializedData
+    });
+
+    request.done(function (response) {
+        console.log(response);
+        if (response == "Success") {
+          alert("Termin zakazan!");
+            console.log("Added appointment");
+            location.reload(true);
+        } else {
+          alert("Termin nije zakazan!");
+            console.log("Appointment not added " + response);
+        }
+        console.log(response);
+    });
+
+    request.fail(function (jqXHR, textStatus, errorThrown) {
+        console.error("Error occurred: " + textStatus, errorThrown);
+    });
+})
+
+$(".edit-appointment").click(function () {
+        var id = $(this).val();
+        console.log("Filling edit form");
+        console.log(id);
 
         request = $.ajax({
-            url: 'handler/add.php',
+            url: 'handler/get.php',
+            type: 'post',
+            data: {'id': id},
+            dataType: 'json'
+        });
+
+        
+        request.done(function (response) {
+            console.log('Form filled');
+            console.log(response);
+
+            $('#idEdit').val(response.id);
+            $('#userEdit').val(response.user.id);
+            $('#serviceEdit').val(response.service.id);
+            
+
+            const date = new Date(response.date_time.date);
+            date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+            date.setSeconds(null);
+            date.setMilliseconds(null);
+
+            document.getElementById('dateEdit').value = date.toISOString().slice(0, -1);
+            
+        });
+
+         request.fail(function (jqXHR, textStatus, errorThrown) {
+           console.error("Error occurred: " + textStatus, errorThrown);
+        });
+    });
+
+$('#editForm').submit(function () {
+        event.preventDefault();
+        console.log("Editing");
+        const $form = $(this);
+        const $inputs = $form.find('input,select');
+        const serializedData = $form.serialize();
+        console.log(serializedData);
+        $inputs.prop('disabled', true);
+
+        request = $.ajax({
+            url: 'handler/edit.php',
             type: 'post',
             data: serializedData
         });
 
         request.done(function (response) {
-            console.log(response);
-            if (response == "Success") {
-              alert("Termin zakazan!");
-                console.log("Added appointment");
+            if (response === 'Success') {
+              alert("Termin promenjen!");
+                console.log('Termin promenjen!');
                 location.reload(true);
             } else {
-              alert("Termin nije zakazan!");
-                console.log("Appointment not added " + response);
+              alert("Termin nije promenjen!");
+              console.log('Termin nije promenjen! ' + response);
             }
             console.log(response);
         });
 
         request.fail(function (jqXHR, textStatus, errorThrown) {
-            console.error("Error occurred: " + textStatus, errorThrown);
+          console.error("Error occurred: " + textStatus, errorThrown);
         });
-    })
+    });
 
-    
+    $(".delete-appointment").click(function () {
+        var id = $(this).val();
+        console.log("Deleting appointment with ID: " + id);
+
+        request = $.ajax({
+            url: 'handler/delete.php',
+            type: 'post',
+            data: {'id': id}
+        });
+
+        request.done(function (response) {
+            if (response == "Success") {
+              alert("Termin izbrisan!");
+                console.log('Deleted');
+                location.reload();
+            } else {
+              alert("Termin nije izbrisan!");
+                console.log("Appointment not deleted " + response);
+            }
+            console.log(response);
+        });
+    });
+
+
 
 </script>
 </body>
