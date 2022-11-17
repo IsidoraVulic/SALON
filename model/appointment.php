@@ -34,7 +34,7 @@ class Appointment{
                 $user = new User($row['user'], $row['contact'], $row['firstname'], $row['lastname']);
                 $service = new Service($row['service'], $row['type'], $row['price']);
                 $date = new DateTime($row['date']);
-                $appointment = new Appointment($row['id'], $user, $service, $date);
+                $appointment = new Appointment($row['app_id'], $user, $service, $date);
                 array_push($appointments, $appointment);
             }
             return $appointments;
@@ -48,7 +48,7 @@ class Appointment{
         $service_id = $appointment->service->id;
         $date = $appointment->date->format("Y-m-d H:i:s");
 
-        $query = "UPDATE appointment SET date = '$date', user = $user_id, service = $service_id WHERE id=$appointment->id";
+        $query = "UPDATE appointment SET date = '$date', user = $user_id, service = $service_id WHERE app_id=$appointment->id";
 
         return $conn->query($query);
     }
@@ -56,7 +56,7 @@ class Appointment{
     //izbrisi termin
 
     public static function deleteById($id, mysqli $conn){
-        $query = "DELETE FROM appointment WHERE id=$id";
+        $query = "DELETE FROM appointment WHERE app_id=$id";
         return $conn->query($query);
     }
 
@@ -86,7 +86,7 @@ class Appointment{
             $user = new User($row["user"], $row["contact"], $row["firstname"], $row["lastname"]);
             $service = new Service($row["service"], $row["type"], $row["price"]);
             $date = new DateTime($row["date"]);
-            return new Appointment($row["id"], $user, $service, $date);
+            return new Appointment($row["app_id"], $user, $service, $date);
         } else {
             return null;
         }
@@ -104,7 +104,7 @@ class Appointment{
             $user = new User($row["user"], $row["contact"], $row["firstname"], $row["lastname"]);
             $service = new Service($row["service"], $row["type"], $row["price"]);
             $date = new DateTime($row["date"]);
-            return new Appointment($row["id"], $user, $service, $date);
+            return new Appointment($row["app_id"], $user, $service, $date);
         } else {
             return null;
         }
