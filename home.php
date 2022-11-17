@@ -5,12 +5,31 @@ require "model/service.php";
 require "model/appointment.php";
 require "model/user.php";
 
+
 session_start();
+
+$cookie_name = "admin";
+$cookie_value = "admin";
+setcookie($cookie_name, $cookie_value, time() + (86400 * 30), "/");
+
+
 
 if(!isset($_SESSION['admin_id'])){
     header('Location: index.php');
     exit();
 }
+
+if(!$_SESSION['auth']) {
+  header('location:index.php');
+}
+else {
+  $currentTime = time();
+  if($currentTime > $_SESSION['expire']) {
+    session_unset();
+    session_destroy();
+    header('location:index.php');
+  }
+  else {
 
 
 $rezultat = Service::getAll($conn);
@@ -47,19 +66,14 @@ if($rezultat->num_rows==0){
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav ml-auto">
         <li class="nav-item active"> <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a> </li>
-        <li class="nav-item"> <a class="nav-link" href="#">About</a> </li>
+        <li class="nav-item"> <a class="nav-link" href="#about">About</a> </li>
         <li class="nav-item"> <a class="nav-link" href="#services"> Services </a> 
         </li>
         <li class="nav-item"> <a class="nav-link" href="#appointments">Appointments</a> </li>
-        <li class="nav-item"> <a class="nav-link" href="#">Contact</a> </li>
+        <li class="nav-item"> <a class="nav-link" href="#contact">Contact</a> </li>
+        <li class="nav-item"> <a class="nav-link" href="logout.php">Logout</a></li>
       </ul>
-      <button
-        id="bookApp" 
-        type="button" 
-        class= "btn btn-sm btn-dark ml-3"
-        data-toggle="modal"
-        data-target="#addModal">BOOK NOW
-        </button>
+      
   </div>
 </nav>
 
@@ -99,6 +113,7 @@ if($rezultat->num_rows==0){
 <div class="container my-5 py-5">
   <div class="row">
     <div class="col-12 text-center">
+      <section id="about">
       <h4 class="small font-weight-bolder dd mb-5 pb-4">HUSH HAIR SALON</h4>
     </div>
   </div>
@@ -129,6 +144,7 @@ if($rezultat->num_rows==0){
         data-toggle="modal"
         data-target="#addModal">BOOK APPOINTMENT
         </button>
+        </section>
     </div>
   </div>
 </div>
@@ -147,9 +163,8 @@ if($rezultat->num_rows==0){
                             <div class="col-xs-12 col-md-5 ">
                                 <select class="custom-select" id="search-appointments-dropdown">
                                     <option value="ID">ID termina</option>
-                                    <option value="Lastname">Prezime korisnika</option>
-                                    <option value="Firstname">Ime korsnika</option>
-                                    <option value="Service">Usluga</option>
+                                    <option value="Prezime korisnika">Prezime korisnika</option>
+                                    <option value="Usluga">Usluga</option>
                                 </select>
                             </div>
                             <div class="col-xs-12 col-md-12 ">
@@ -391,9 +406,11 @@ if($rezultat->num_rows==0){
 
 <!---------------Footer section ends here --------------------->
 <div class="container">
+  <section id="contact">
   <div class="row py-3 footer-copyright">
     <div class="col-md-4"> <a href="#">Privacy Policy</a> - <a href="#">Contact Us</a> </div>
     <div class="col-md-8 text-right"> © Copyright 2019 Hair Salon. All Rights Reserved. Template by <a target="_blank" href="http://bootstraplily.com/">BootstrapLily.com</a> </div>
+                </section>
   </div>
 </div>
 
@@ -515,8 +532,10 @@ if($rezultat->num_rows==0){
         </div>
     </div>
 </div>
-
-
+<?php
+                                      }
+                                    }
+?>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script> 
@@ -787,8 +806,7 @@ $('#editForm').submit(function () {
         }
       }
     }
-
-
+  
 </script>
 </body>
 </html>

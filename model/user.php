@@ -3,32 +3,18 @@
 class User{
 
     public $id;
-    public $username;
-    public $password;
     public $firstname;
     public $lastname;
     public $contact;
 
-    public function __construct($id=null, $username=null, $password=null, $contact=null, $firstname=null, $lastname=null){
+    public function __construct($id=null, $contact=null, $firstname=null, $lastname=null){
         $this->id = $id;
-        $this->username = $username;
-        $this->password = $password;
         $this->contact = $contact;
         $this->firstname = $firstname;
         $this->lastname = $lastname;
         
     }
 
-    public static function loginUser($username, $password, mysqli $conn): ?User
-    {
-        $query = "SELECT * FROM user WHERE username = '$username' AND password = '$password'";
-        $result = $conn->query($query);
-
-        if ($result->num_rows == 1) {
-            return new User($result->fetch_assoc()["id"], $username, $password);
-        }
-        return null;
-    }
 
     public static function getById($id, mysqli $conn): ?User
     {
@@ -36,7 +22,7 @@ class User{
         $result = $conn->query($query);
         if ($result) {
             $row = $result->fetch_array(1);
-            return new User($row["id"], $row["username"], $row["password"], $row["contact"], $row["firstname"], $row["lastname"]);
+            return new User($row["id"], $row["contact"], $row["firstname"], $row["lastname"]);
         } else {
             return null;
         }
@@ -57,7 +43,7 @@ class User{
         } else {
             $users = array();
             while ($row = $result->fetch_array()) {
-                $user = new User($row["id"], $row["username"], $row["password"], $row["contact"], $row["firstname"], $row["lastname"]);
+                $user = new User($row["id"], $row["contact"], $row["firstname"], $row["lastname"]);
                 array_push($users, $user);
             }
             return $users;

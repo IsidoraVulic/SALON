@@ -31,7 +31,7 @@ class Appointment{
         } else {
             $appointments = array();
             while ($row = mysqli_fetch_array($result)) {
-                $user = new User($row['user'], $row['username'], $row['password'],$row['contact'], $row['firstname'], $row['lastname']);
+                $user = new User($row['user'], $row['contact'], $row['firstname'], $row['lastname']);
                 $service = new Service($row['service'], $row['type'], $row['price']);
                 $date = new DateTime($row['date']);
                 $appointment = new Appointment($row['id'], $user, $service, $date);
@@ -83,7 +83,7 @@ class Appointment{
 
         if ($result) {
             $row = $result->fetch_array(1);
-            $user = new User($row["user"], $row["username"], $row["password"], $row["contact"], $row["firstname"], $row["lastname"]);
+            $user = new User($row["user"], $row["contact"], $row["firstname"], $row["lastname"]);
             $service = new Service($row["service"], $row["type"], $row["price"]);
             $date = new DateTime($row["date"]);
             return new Appointment($row["id"], $user, $service, $date);
@@ -101,7 +101,7 @@ class Appointment{
 
         if ($result) {
             $row = $result->fetch_array(1);
-            $user = new User($row["user"], $row["username"], $row["password"], $row["contact"], $row["firstname"], $row["lastname"]);
+            $user = new User($row["user"], $row["contact"], $row["firstname"], $row["lastname"]);
             $service = new Service($row["service"], $row["type"], $row["price"]);
             $date = new DateTime($row["date"]);
             return new Appointment($row["id"], $user, $service, $date);

@@ -3,6 +3,7 @@
 require "dbBroker.php";
 require "model/admin.php";
 
+
 session_start();
 
 $loginError = false;
@@ -14,7 +15,9 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
     $admin = Admin::loginAdmin($username, $password, $conn);
 
     if ($admin != null) {
-		ini_set('session.gc_maxlifetime', 60*60*24);
+		$_SESSION['auth'] = true;
+        $_SESSION['start'] = time();
+        $_SESSION['expire'] = $_SESSION['start'] + (30 * 60);
         $_SESSION['admin_id'] = $admin->id;
 
         header('Location: home.php');
@@ -40,17 +43,13 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 	<link rel="stylesheet" href="css/style.css">
 	
 	</head>
-	<body style="background-image: url(images/salon.png);">
+	<body style="background-image: url(images/salon.jpg);">
 	<section class="ftco-section">
 		<div class="container">
 			<div class="row justify-content-center">
-				<div class="col-md-6 text-center mb-5">
-					<h3 class="heading-section">Login</h3>
-				</div>
-			</div>
-			<div class="row justify-content-center">
 				<div class="col-md-6 col-lg-4">
 					<div class="login-wrap p-0">
+				<h3 class="mb-4 text-center"><b>Login</b></h3>
 		      	<h3 class="mb-4 text-center">Have an account?</h3>
 		      	<form method="POST" action="#" class="signin-form">
 		      		<div class="form-group">
@@ -64,10 +63,6 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 	            	<button type="submit" class="form-control btn btn-primary submit px-3">Sign In</button>
 	            </div>
 	          </form>
-	          <p class="w-100 text-center">&mdash; Or Create an Account&mdash;</p>
-	          <div class="social d-flex text-center">
-	          	<a href="#" class="px-2 py-2 mr-md-1 rounded">Register</a>
-	          	
 	          </div>
 		      </div>
 				</div>

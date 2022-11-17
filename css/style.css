@@ -70,7 +70,7 @@ hr {
   overflow: visible; }
 
 h1, h2, h3, h4, h5, h6 {
-  margin-top: 0;
+  margin-top: 1rem;
   margin-bottom: 0.5rem; }
 
 p {
@@ -5768,7 +5768,7 @@ button.bg-dark:focus {
   -webkit-box-pack: end !important;
   -ms-flex-pack: end !important;
   justify-content: flex-end !important; }
-
+ify-content
 .justify-content-center {
   -webkit-box-pack: center !important;
   -ms-flex-pack: center !important;
