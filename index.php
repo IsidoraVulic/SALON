@@ -45,9 +45,11 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 	</head>
 	<body style="background-image: url(images/salon.jpg);">
 	<section class="ftco-section">
-		<div class="container">
+		<div class="container" style="position: absolute;
+									top: 50%;
+									left: 25%;>
 			<div class="row justify-content-center">
-				<div class="col-md-6 col-lg-4">
+				<div class="col-md-10 col-lg-6">
 					<div class="login-wrap p-0">
 				<h3 class="mb-4 text-center"><b>Login</b></h3>
 		      	<h3 class="mb-4 text-center">Have an account?</h3>

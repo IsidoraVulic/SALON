@@ -181,6 +181,7 @@ if($rezultat->num_rows==0){
                     <th scope="col">ID termina</th>
                     <th onclick="sortTable2(1)" scope="col">Ime korisnika</th>
                     <th onclick="sortTable2(2)" scope="col">Prezime korisnika</th>
+                    <th scope="col">Kontakt</th>
                     <th onclick="sortTable2(3)" scope="col">Usluga</th>
                     <th scope="col">Cena</th>
                     <th scope="col">Datum</th>
@@ -204,6 +205,7 @@ if($rezultat->num_rows==0){
                     <td><?php echo $appointment->id ?></td>
                     <td><?php echo $appointment->user->firstname ?></td>
                     <td><?php echo $appointment->user->lastname ?></td>
+                    <td><?php echo $appointment->user->contact ?></td>
                     <td><?php echo $appointment->service->type?></td>
                     <td><?php echo $appointment->service->price?></td>
                     <td><?php echo $appointment->date->format("j M Y , g:i a")?></td>
